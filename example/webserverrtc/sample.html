@@ -1,0 +1,65 @@
+<html>
+<head>
+    <title>Sample WebServerRTC Application</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+
+    <script type="text/javascript" charset="utf-8">
+    function waitForMsg(){
+        $.ajax({
+            type: "GET",
+            url: "/rtc/indata",
+            async: true,
+            cache: false,
+            timeout:50000,
+            success: function(data){
+            	if (data == "") {
+            		/* data is empty */
+            	} else {
+			        $("#messages").append("<p>"+ data +"</p>");
+	            }
+                setTimeout('waitForMsg()', 100);
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                $("#messages").append("<p>" + textStatus + " (" + errorThrown + ")</p>");
+                setTimeout('waitForMsg()', 100);
+            },
+        });
+    };
+
+    function sendMsg(){
+    	data = $("#input").val()
+		$("#results").append("<p>send data: "+ data +"</p>");
+        $.ajax({
+            type: "GET",
+            url: "/rtc/outdata",
+            data: data,
+            async: true,
+            cache: false,
+            timeout:50000,
+            success: function(data){
+		        $("#results").append("<p>"+ data +"</p>");
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown){
+                $("#results").append("<p>"+ textStatus + " (" + errorThrown + ")</p>");
+            },
+        });
+    };
+
+    $(document).ready(function(){
+        waitForMsg(); /* Start the inital request */
+    });
+    </script>
+</head>
+<body>
+	<h1>received messages</h1>
+    <div id="messages">
+    </div>
+	<h1>send message</h1>
+	<form name="sendmessage" action="#">
+		<input id="input" type="text" />
+		<input type="button" value="send" onclick="sendMsg()" />
+	</form>
+    <div id="results">
+    </div>
+</body>
+</html>
