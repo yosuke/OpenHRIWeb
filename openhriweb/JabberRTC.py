@@ -25,10 +25,6 @@ from pyxmpp.all import JID, Message
 from pyxmpp.jabber.client import JabberClient
 from pyxmpp.streamtls import TLSSettings
 
-from xml.dom import minidom
-from xml.dom.minidom import Document
-from BeautifulSoup import BeautifulSoup
-
 class Client(JabberClient):
     def __init__(self, jid, password, obj):
         if not jid.resource:
@@ -53,12 +49,8 @@ class Client(JabberClient):
         body = stanza.get_body()
         if body is not None:
             print u'%s has send you message: %s' % (f, body)
-            doc = Document()
-            msg = doc.createElement("message")
-            msg.setAttribute("from", f)
-            msg.setAttribute("body", body)
-            doc.appendChild(msg)
-            self._rtobj._outdata.data = doc.toxml(encoding="utf-8")
+            self._rtobj._outdata.data[0] = body
+            self._rtobj._outdata.data[1] = f
             self._rtobj._outport.write()
 
     def sendmessage(self, to, body):
@@ -73,12 +65,8 @@ class Client(JabberClient):
         if stanza.get_show() == "away":
             state = "away"
         print u"%s has become %s" % (f, state)
-        doc = Document()
-        msg = doc.createElement("status")
-        msg.setAttribute("from", f)
-        msg.setAttribute("state", state)
-        doc.appendChild(msg)
-        self._rtobj._statedata.data = doc.toxml(encoding="utf-8")
+        self._rtobj._statedata.data[0] = state
+        self._rtobj._statedata.data[1] = f
         self._rtobj._stateport.write()
 
     def presence_control(self,stanza):
@@ -88,6 +76,8 @@ class Client(JabberClient):
 JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "type_name",         "JabberRTC",
                   "description",       "Jabber(XMPP) messaging component (python implementation)",
+                  "long_description",  "Jabber(XMPP) messaging component (python implementation)",
+                  "usage",             "See http://github.com/yosuke/openhriweb/example",
                   "version",           "1.0.0",
                   "vendor",            "AIST",
                   "category",          "communication",
@@ -95,8 +85,10 @@ JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "max_instance",      "10",
                   "language",          "Python",
                   "lang_type",         "script",
-                  "conf.default.id",   "[your id]@gmail.com",
-                  "conf.default.password", "[your password]"
+                  "conf.default.id",               "[your id]@gmail.com",
+                  "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
+                  "conf.default.password",         "[your password]"
+                  "conf.__description__.password", "Password of your Jabber account."
                   ""]
 
 class DataListener(OpenRTM_aist.ConnectorDataListenerT):
@@ -105,84 +97,66 @@ class DataListener(OpenRTM_aist.ConnectorDataListenerT):
         self._obj = obj
     
     def __call__(self, info, cdrdata):
-        data = OpenRTM_aist.ConnectorDataListenerT.__call__(self, info, cdrdata, RTC.TimedString(RTC.Time(0,0),""))
+        data = OpenRTM_aist.ConnectorDataListenerT.__call__(self, info, cdrdata, RTC.TimedStringSeq(RTC.Time(0,0),[]))
         self._obj.onData(self._name, data)
 
 class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
     def __init__(self, manager):
-        try:
-            OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
-            self._c = None
-            self._jid = ["",]
-            self._password = ["",]
-        except:
-            print traceback.format_exc()
+        OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
+        self._c = None
+        self._jid = ['',]
+        self._password = ['',]
 
     def onInitialize(self):
-        try:
-            # bind configuration parameters
-            self.bindParameter("id", self._jid, "[your id]@gmail.com")
-            self.bindParameter("password", self._password, "[your password]")
-            # create inport
-            self._indata = RTC.TimedString(RTC.Time(0,0), "")
-            self._inport = OpenRTM_aist.InPort("text", self._indata)
-            self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
-                                                  DataListener("ON_BUFFER_WRITE", self))
-            self.registerInPort("text", self._inport)
-            # create outport for message
-            self._outdata = RTC.TimedString(RTC.Time(0,0), "")
-            self._outport = OpenRTM_aist.OutPort("message", self._outdata)
-            self.registerOutPort("message", self._outport)
-            # create outport for status
-            self._statedata = RTC.TimedString(RTC.Time(0,0), "")
-            self._stateport = OpenRTM_aist.OutPort("status", self._statedata)
-            self.registerOutPort("status", self._stateport)
-        except:
-            print traceback.format_exc()
+        # bind configuration parameters
+        self.bindParameter('id', self._jid, '[your id]@gmail.com')
+        self.bindParameter('password', self._password, '[your password]')
+        # create inport
+        self._indata = RTC.TimedStringSeq(RTC.Time(0,0), [])
+        self._inport = OpenRTM_aist.InPort('text', self._indata)
+        self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
+                                              DataListener('ON_BUFFER_WRITE', self))
+        self._inport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "addressee1(e.g. jane.doe@example.com)", "adressee2",...]')
+        self.registerInPort(self._inport._name, self._inport)
+        # create outport for message
+        self._outdata = RTC.TimedStringSeq(RTC.Time(0,0), [])
+        self._outport = OpenRTM_aist.OutPort('message', self._outdata)
+        self._outport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "from(e.g. jane.doe@example.com)"]')
+        self.registerOutPort(self._outport._name, self._outport)
+        # create outport for status
+        self._statedata = RTC.TimedStringSeq(RTC.Time(0,0), [])
+        self._stateport = OpenRTM_aist.OutPort('status', self._statedata)
+        self._outport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from(e.g. jane.doe@example.com)"]')
+        self.registerOutPort(self._stateport._name, self._stateport)
         return RTC.RTC_OK
 
     def onActivated(self, ec_id):
-        try:
-            self._c = Client(JID(self._jid[0]), self._password[0], self)
-            self._c.connect()
-        except:
-            print traceback.format_exc()
+        self._c = Client(JID(self._jid[0]), self._password[0], self)
+        self._c.connect()
         return RTC.RTC_OK
     
     def onDeactivate(self, ec_id):
-        try:
-            if self._c:
-                self._c.disconnect()
-                self._c = None
-        except:
-            print traceback.format_exc()
+        if self._c:
+            self._c.disconnect()
+            self._c = None
         return RTC.RTC_OK
 
     def onData(self, name, data):
-        try:
-            doc = BeautifulSoup(data.data)
-            if doc:
-                to = doc.first()["to"]
-                body = doc.first()["body"]
-                self._c.sendmessage(to, body)
-        except:
-            print traceback.format_exc()
+        body = data.data[0]
+        for to in data.data[1:]:
+            self._c.sendmessage(to, body)
 
     def onResult(self, data):
         pass
     
     def onExecute(self, ec_id):
-        try:
-            if self._c:
-                self._c.loop(1)
-        except:
-            print traceback.format_exc()
+        if self._c:
+            self._c.loop(1)
         return RTC.RTC_OK
 
     def onFinalize(self):
-        if self._c:
-            self._c.disconnect()
-            self._c = None
+        self._c.disconnect()
+        self._c = None
         return RTC.RTC_OK
 
 class JabberRTCManager:
@@ -198,15 +172,15 @@ class JabberRTCManager:
     def moduleInit(self, manager):
         profile=OpenRTM_aist.Properties(defaults_str=JabberRTC_spec)
         manager.registerFactory(profile, JabberRTC, OpenRTM_aist.Delete)
-        self._comp = manager.createComponent("JabberRTC?exec_cxt.periodic.rate=0.1")
+        self._comp = manager.createComponent('JabberRTC?exec_cxt.periodic.rate=0.1')
 
 def main():
-    locale.setlocale(locale.LC_CTYPE, "")
+    locale.setlocale(locale.LC_CTYPE, '')
     encoding = locale.getlocale()[1]
     if not encoding:
-        encoding = "us-ascii"
-    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = "replace")
-    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = "replace")
+        encoding = 'us-ascii'
+    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = 'replace')
+    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = 'replace')
     manager = JabberRTCManager()
     manager.start()
 

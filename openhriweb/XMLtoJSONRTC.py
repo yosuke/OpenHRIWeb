@@ -56,40 +56,29 @@ class DataListener(OpenRTM_aist.ConnectorDataListenerT):
 
 class XMLtoJSONRTC(OpenRTM_aist.DataFlowComponentBase):
     def __init__(self, manager):
-        try:
-            OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
-        except:
-            print traceback.format_exc()
+        OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
 
     def onInitialize(self):
-        try:
-            self._transform = objectJSONEncoder()
-            # create inport
-            self._indata = RTC.TimedString(RTC.Time(0,0), "")
-            self._inport = OpenRTM_aist.InPort("text", self._indata)
-            self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
-                                                  DataListener("ON_BUFFER_WRITE", self))
-            self.registerInPort("text", self._inport)
-            # create outport
-            self._outdata = RTC.TimedString(RTC.Time(0,0), "")
-            self._outport = OpenRTM_aist.OutPort("result", self._outdata)
-            self.registerOutPort("result", self._outport)
-        except:
-            print traceback.format_exc()
+        self._transform = objectJSONEncoder()
+        # create inport
+        self._indata = RTC.TimedString(RTC.Time(0,0), "")
+        self._inport = OpenRTM_aist.InPort("text", self._indata)
+        self._inport.appendProperty('description', 'Input text in XML format.')
+        self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
+                                              DataListener("ON_BUFFER_WRITE", self))
+        self.registerInPort(self._inport._name, self._inport)
+        # create outport
+        self._outdata = RTC.TimedString(RTC.Time(0,0), "")
+        self._outport = OpenRTM_aist.OutPort("result", self._outdata)
+        self._outport.appendProperty('description', 'Output text in JSON format.')
+        self.registerOutPort(self._inport._name, self._outport)
         return RTC.RTC_OK
     
     def onData(self, name, data):
-        try:
-            udoc = lxml.objectify.fromstring(data.data)
-            self._outdata.data = self._transform.encode(udoc)
-            self._outport.write(self._outdata)
-            print self._outdata.data
-        except:
-            print traceback.format_exc()
-
-    def onExecute(self, ec_id):
-        time.sleep(1)
-        return RTC.RTC_OK
+        udoc = lxml.objectify.fromstring(data.data)
+        self._outdata.data = self._transform.encode(udoc)
+        self._outport.write(self._outdata)
+        print self._outdata.data
 
 class XMLtoJSONRTCManager:
     def __init__(self):
