@@ -76,10 +76,20 @@ class Client(JabberClient):
 JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "type_name",         "JabberRTC",
                   "description",       "Jabber(XMPP) messaging component (python implementation)",
-                  "long_description",  "Jabber(XMPP) messaging component (python implementation)",
-                  "usage",             "See http://github.com/yosuke/openhriweb/example",
+                  "doc_introduction",  """
+Bridge RTC data stream to Jabber(XMPP) message. By using this component
+you can send and receive messages to Jabber clients (e.g. google talk) from
+your robot.
+""",
+                  "doc_usage",         """
+To run this component:
+ $ jabberrtc
+
+Examples:
+ See http://github.com/yosuke/openhriweb/example
+""",
                   "version",           "1.0.0",
-                  "vendor",            "AIST",
+                  "vendor",            "Yosuke Matsusaka, AIST",
                   "category",          "communication",
                   "activity_type",     "DataFlowComponent",
                   "max_instance",      "10",
@@ -87,8 +97,8 @@ JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "lang_type",         "script",
                   "conf.default.id",               "[your id]@gmail.com",
                   "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
-                  "conf.default.password",         "[your password]"
-                  "conf.__description__.password", "Password of your Jabber account."
+                  "conf.default.password",         "[your password]",
+                  "conf.__description__.password", "Password of your Jabber account.",
                   ""]
 
 class DataListener(OpenRTM_aist.ConnectorDataListenerT):
@@ -126,7 +136,7 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
         # create outport for status
         self._statedata = RTC.TimedStringSeq(RTC.Time(0,0), [])
         self._stateport = OpenRTM_aist.OutPort('status', self._statedata)
-        self._outport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from(e.g. jane.doe@example.com)"]')
+        self._stateport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from(e.g. jane.doe@example.com)"]')
         self.registerOutPort(self._stateport._name, self._stateport)
         return RTC.RTC_OK
 
