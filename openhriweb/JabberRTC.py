@@ -126,17 +126,17 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
         self._inport = OpenRTM_aist.InPort('text', self._indata)
         self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
                                               DataListener('ON_BUFFER_WRITE', self))
-        self._inport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "addressee1(e.g. jane.doe@example.com)", "adressee2",...]')
+        self._inport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "addressee1", "adressee2",...]')
         self.registerInPort(self._inport._name, self._inport)
         # create outport for message
         self._outdata = RTC.TimedStringSeq(RTC.Time(0,0), [])
         self._outport = OpenRTM_aist.OutPort('message', self._outdata)
-        self._outport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "from(e.g. jane.doe@example.com)"]')
+        self._outport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "from"]')
         self.registerOutPort(self._outport._name, self._outport)
         # create outport for status
         self._statedata = RTC.TimedStringSeq(RTC.Time(0,0), [])
         self._stateport = OpenRTM_aist.OutPort('status', self._statedata)
-        self._stateport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from(e.g. jane.doe@example.com)"]')
+        self._stateport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from"]')
         self.registerOutPort(self._stateport._name, self._stateport)
         return RTC.RTC_OK
 
@@ -165,8 +165,9 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
         return RTC.RTC_OK
 
     def onFinalize(self):
-        self._c.disconnect()
-        self._c = None
+        if self._c:
+            self._c.disconnect()
+            self._c = None
         return RTC.RTC_OK
 
 class JabberRTCManager:
@@ -182,7 +183,7 @@ class JabberRTCManager:
     def moduleInit(self, manager):
         profile=OpenRTM_aist.Properties(defaults_str=JabberRTC_spec)
         manager.registerFactory(profile, JabberRTC, OpenRTM_aist.Delete)
-        self._comp = manager.createComponent('JabberRTC?exec_cxt.periodic.rate=0.1')
+        self._comp = manager.createComponent('JabberRTC')
 
 def main():
     locale.setlocale(locale.LC_CTYPE, '')

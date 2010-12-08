@@ -20,17 +20,7 @@ from urlparse import urlparse
 import OpenRTM_aist
 import RTC
 
-# signal handler
-def myhandler(code, val):
-    global httpd, mainloop
-    print 'terminating...'
-    mgr = OpenRTM_aist.Manager.instance()
-    mgr.terminate()
-    #httpd.shutdown()
-    #exit()
-    mainloop = False
-
-# workaround for reverse DNS solving
+# workaround for reverse DNS lookup
 def my_address_string(self):
     host, port = self.client_address[:2]
     return '%s' % host
@@ -100,37 +90,34 @@ class WebServerRTC(OpenRTM_aist.DataFlowComponentBase):
         return RTC.RTC_OK
 
     def onRequest(self, s):
-        try:
-            p = urlparse(s.path)
-            if p.path == "/rtc/indata":
-                print "reading data from inport... "
-                while not self._inport.isNew():
-                    time.sleep(0.1)
-                data = self._inport.read().data
-                #if self._inport.isNew():
-                #    data = self._inport.read().data
-                #else:
-                #    data = ""
-                print "read data from inport: %s"  % (data,)
-                print "sending data to the client... "
-                try:
-                    s.send_response(200)
-                    s.send_header("Content-type", "text/html")
-                    s.end_headers()
-                    s.wfile.write(data)
-                    print "done"
-                except:
-                    print "write error (probably the client has timed out)"
-            elif p.path == "/rtc/outdata":
-                self._outdata.data = p.query
-                self._outport.write()
+        p = urlparse(s.path)
+        if p.path == "/rtc/indata":
+            print "reading data from inport... "
+            while not self._inport.isNew():
+                time.sleep(0.1)
+            data = self._inport.read().data
+            #if self._inport.isNew():
+            #    data = self._inport.read().data
+            #else:
+            #    data = ""
+            print "read data from inport: %s"  % (data,)
+            print "sending data to the client... "
+            try:
                 s.send_response(200)
                 s.send_header("Content-type", "text/html")
                 s.end_headers()
-                s.wfile.write("OK")
-                print "write data to outport: %s"  % (p.query,)
-        except:
-            print traceback.format_exc()
+                s.wfile.write(data)
+                print "done"
+            except:
+                print "write error (probably the client has timed out)"
+        elif p.path == "/rtc/outdata":
+            self._outdata.data = p.query
+            self._outport.write()
+            s.send_response(200)
+            s.send_header("Content-type", "text/html")
+            s.end_headers()
+            s.wfile.write("OK")
+            print "write data to outport: %s"  % (p.query,)
 
     def onExecute(self, ec_id):
         self._httpd.handle_request()
@@ -156,15 +143,12 @@ class WebServerRTCManager:
         self.manager.activateManager()
 
     def start(self):
-        self.manager.runManager()
+        self.manager.runManager(False)
 
     def moduleInit(self, manager):
-        try:
-            profile=OpenRTM_aist.Properties(defaults_str=WebServerRTC_spec)
-            manager.registerFactory(profile, WebServerRTC, OpenRTM_aist.Delete)
-            self.comp = manager.createComponent("WebServerRTC")
-        except:
-            print traceback.format_exc()
+        profile=OpenRTM_aist.Properties(defaults_str=WebServerRTC_spec)
+        manager.registerFactory(profile, WebServerRTC, OpenRTM_aist.Delete)
+        self.comp = manager.createComponent("WebServerRTC")
 
 def main():
     global manager
