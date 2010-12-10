@@ -76,20 +76,8 @@ class Client(JabberClient):
 JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "type_name",         "JabberRTC",
                   "description",       "Jabber(XMPP) messaging component (python implementation)",
-                  "doc_introduction",  """
-Bridge RTC data stream to Jabber(XMPP) message. By using this component
-you can send and receive messages to Jabber clients (e.g. google talk) from
-your robot.
-""",
-                  "doc_usage",         """
-To run this component:
- $ jabberrtc
-
-Examples:
- See http://github.com/yosuke/openhriweb/example
-""",
                   "version",           "1.0.0",
-                  "vendor",            "Yosuke Matsusaka, AIST",
+                  "vendor",            "AIST",
                   "category",          "communication",
                   "activity_type",     "DataFlowComponent",
                   "max_instance",      "10",
@@ -99,6 +87,21 @@ Examples:
                   "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
                   "conf.default.password",         "[your password]",
                   "conf.__description__.password", "Password of your Jabber account.",
+                  "conf.__document__.contact",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
+                  "conf.__document__.license",  "EPL",
+                  "conf.__document__.url",  "http://openhri.net/",
+                  "conf.__document__.introduction",  """
+Bridge RTC data stream to Jabber(XMPP) message. By using this component
+you can send and receive messages to Jabber clients (e.g. google talk) from
+your robot.
+""",
+                  "conf.__document__.usage",         """
+To run this component:
+ $ jabberrtc
+
+Examples:
+ See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/jabberrtc
+""",
                   ""]
 
 class DataListener(OpenRTM_aist.ConnectorDataListenerT):
