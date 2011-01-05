@@ -27,6 +27,7 @@ if sys.platform == "win32":
             "openhriweb/JabberRTC.py",
             "openhriweb/WebServerRTC.py",
             "openhriweb.XMLtoJSONRTC.py"
+            "openhriweb.Manager.py"
             ],
         "options": {
             "py2exe": {
@@ -59,6 +60,7 @@ setup(name='openhriweb',
     jabberrtc = openhriweb.JabberRTC:main
     webserverrtc = openhriweb.WebServerRTC:main
     xmltojsonrtc = openhriweb.XMLtoJSONRTC:main
+    openhriwebmanager = openhriweb.Manager:main
     """,
     **extra
     )

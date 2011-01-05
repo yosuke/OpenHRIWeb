@@ -48,7 +48,7 @@ class ThreadedHTTPServer(ThreadingMixIn, CGIHTTPServer.BaseHTTPServer.HTTPServer
 
 WebServerRTC_spec = ["implementation_id", "WebServerRTC",
                      "type_name",         "WebServerRTC",
-                     "description",       "Web Server Component",
+                     "description",       "Web server component",
                      "version",           "1.0.0",
                      "vendor",            "Yosuke Matsusaka, AIST",
                      "category",          "Web",
@@ -135,25 +135,27 @@ class WebServerRTC(OpenRTM_aist.DataFlowComponentBase):
             self._httpd = None
         return RTC.RTC_OK
 
-class WebServerRTCManager:
-    def __init__(self):
-        self.comp = None
-        self.manager = OpenRTM_aist.Manager.init(sys.argv)
-        self.manager.setModuleInitProc(self.moduleInit)
-        self.manager.activateManager()
+def WebServerRTCInit(manager):
+    profile = OpenRTM_aist.Properties(defaults_str=WebServerRTC_spec)
+    manager.registerFactory(profile, WebServerRTC, OpenRTM_aist.Delete)
 
-    def start(self):
-        self.manager.runManager(False)
-
-    def moduleInit(self, manager):
-        profile=OpenRTM_aist.Properties(defaults_str=WebServerRTC_spec)
-        manager.registerFactory(profile, WebServerRTC, OpenRTM_aist.Delete)
-        self.comp = manager.createComponent("WebServerRTC")
+def MyModuleInit(manager):
+    global comp
+    WebServerRTCInit(manager)
+    comp = manager.createComponent('WebServerRTC')
 
 def main():
-    global manager
-    manager = WebServerRTCManager()
-    manager.start()
+    locale.setlocale(locale.LC_CTYPE, '')
+    encoding = locale.getlocale()[1]
+    if not encoding:
+        encoding = 'us-ascii'
+    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = 'replace')
+    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = 'replace')
+
+    manager = OpenRTM_aist.Manager.init(sys.argv)
+    manager.setModuleInitProc(MyModuleInit)
+    manager.activateManager()
+    manager.runManager()
 
 if __name__=='__main__':
     main()

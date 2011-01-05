@@ -75,7 +75,7 @@ class Client(JabberClient):
 
 JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "type_name",         "JabberRTC",
-                  "description",       "Jabber(XMPP) messaging component (python implementation)",
+                  "description",       "Jabber(XMPP) messaging component",
                   "version",           "1.0.0",
                   "vendor",            "AIST",
                   "category",          "communication",
@@ -87,15 +87,15 @@ JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
                   "conf.default.password",         "[your password]",
                   "conf.__description__.password", "Password of your Jabber account.",
-                  "conf.__document__.contact",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
-                  "conf.__document__.license",  "EPL",
-                  "conf.__document__.url",  "http://openhri.net/",
-                  "conf.__document__.introduction",  """
+                  "conf.__doc__.contact",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
+                  "conf.__doc__.license",  "EPL",
+                  "conf.__doc__.url",  "http://openhri.net/",
+                  "conf.__doc__.introduction",  """
 Bridge RTC data stream to Jabber(XMPP) message. By using this component
 you can send and receive messages to Jabber clients (e.g. google talk) from
 your robot.
 """,
-                  "conf.__document__.usage",         """
+                  "conf.__doc__.usage",         """
 To run this component:
  $ jabberrtc
 
@@ -173,20 +173,14 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
             self._c = None
         return RTC.RTC_OK
 
-class JabberRTCManager:
-    def __init__(self):
-        self._comp = None
-        self._manager = OpenRTM_aist.Manager.init(sys.argv)
-        self._manager.setModuleInitProc(self.moduleInit)
-        self._manager.activateManager()
+def JabberRTCInit(manager):
+    profile = OpenRTM_aist.Properties(defaults_str=JabberRTC_spec)
+    manager.registerFactory(profile, JabberRTC, OpenRTM_aist.Delete)
 
-    def start(self):
-        self._manager.runManager(False)
-
-    def moduleInit(self, manager):
-        profile=OpenRTM_aist.Properties(defaults_str=JabberRTC_spec)
-        manager.registerFactory(profile, JabberRTC, OpenRTM_aist.Delete)
-        self._comp = manager.createComponent('JabberRTC')
+def MyModuleInit(manager):
+    global comp
+    JabberRTCInit(manager)
+    comp = manager.createComponent('JabberRTC')
 
 def main():
     locale.setlocale(locale.LC_CTYPE, '')
@@ -195,8 +189,11 @@ def main():
         encoding = 'us-ascii'
     sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = 'replace')
     sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = 'replace')
-    manager = JabberRTCManager()
-    manager.start()
+
+    manager = OpenRTM_aist.Manager.init(sys.argv)
+    manager.setModuleInitProc(MyModuleInit)
+    manager.activateManager()
+    manager.runManager()
 
 if __name__=='__main__':
     main()
