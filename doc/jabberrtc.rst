@@ -1,6 +1,6 @@
 JabberRTC0.rtc
 ==============
-Jabber(XMPP) messaging component (python implementation)
+Jabber(XMPP) messaging component
 
 :Vendor: AIST
 :Version: 1.0.0
@@ -10,11 +10,20 @@ Jabber(XMPP) messaging component (python implementation)
 :URL: http://openhri.net/
 
 Introduction
-------------
+============
 
 Bridge RTC data stream to Jabber(XMPP) message. By using this component
 you can send and receive messages to Jabber clients (e.g. google talk) from
 your robot.
+
+Usage
+=====
+
+To run this component:
+ $ jabberrtc
+
+Examples:
+ See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/jabberrtc
 
 Ports
 -----
@@ -34,13 +43,4 @@ Configuration parameters
    
    "password", "Password of your Jabber account."
    "id", "Id of your Jabber account (e.g. john.doe@example.com)."
-
-Usage
------
-
-To run this component:
- $ jabberrtc
-
-Examples:
- See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/jabberrtc
 

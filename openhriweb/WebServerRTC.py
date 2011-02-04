@@ -13,7 +13,14 @@ Licensed under the Eclipse Public License -v 1.0 (EPL)
 http://www.opensource.org/licenses/eclipse-1.0.txt
 '''
 
-import sys, os, signal, time, traceback, threading
+import sys
+import os
+import signal
+import time
+import traceback
+import threading
+import locale
+import codecs
 import CGIHTTPServer
 from SocketServer import ThreadingMixIn
 from urlparse import urlparse
@@ -60,6 +67,20 @@ WebServerRTC_spec = ["implementation_id", "WebServerRTC",
                      "conf.__description__.port",         "Port of HTTP server (e.g. 6809).",
                      "conf.default.documentroot",         ".",
                      "conf.__description__.documentroot", "Root path of html documents (e.g. /var/www).",
+                     "conf.__doc__.__contact__",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
+                     "conf.__doc__.__license__",  "EPL",
+                     "conf.__doc__.__url__",  "http://openhri.net/",
+                     "conf.__doc__.intro",  """
+Bridge RTC data stream to HTTP protocol. By using this component you can
+control your robot using web browser.
+""",
+                     "conf.__doc__.usage",         """
+To run this component:
+ $ webserverrtc
+
+Examples:
+ See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/webserverrtc
+""",
                      ""]
 
 class WebServerRTC(OpenRTM_aist.DataFlowComponentBase):

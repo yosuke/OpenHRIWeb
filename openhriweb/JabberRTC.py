@@ -87,10 +87,10 @@ JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
                   "conf.default.password",         "[your password]",
                   "conf.__description__.password", "Password of your Jabber account.",
-                  "conf.__doc__.contact",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
-                  "conf.__doc__.license",  "EPL",
-                  "conf.__doc__.url",  "http://openhri.net/",
-                  "conf.__doc__.introduction",  """
+                  "conf.__doc__.__contact__",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
+                  "conf.__doc__.__license__",  "EPL",
+                  "conf.__doc__.__url__",  "http://openhri.net/",
+                  "conf.__doc__.intro",  """
 Bridge RTC data stream to Jabber(XMPP) message. By using this component
 you can send and receive messages to Jabber clients (e.g. google talk) from
 your robot.

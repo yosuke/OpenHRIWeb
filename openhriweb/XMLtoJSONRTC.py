@@ -13,7 +13,13 @@ Licensed under the Eclipse Public License -v 1.0 (EPL)
 http://www.opensource.org/licenses/eclipse-1.0.txt
 '''
 
-import os, sys, time, traceback, getopt
+import os
+import sys
+import time
+import traceback
+import getopt
+import locale
+import codecs
 import lxml
 import lxml.objectify
 import simplejson as json
