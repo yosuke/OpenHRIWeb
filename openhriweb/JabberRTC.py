@@ -14,16 +14,25 @@ http://www.opensource.org/licenses/eclipse-1.0.txt
 '''
 
 import sys
+import os
 import locale
 import codecs
 import traceback
-
 import OpenRTM_aist
 import RTC
-
 from pyxmpp.all import JID, Message
 from pyxmpp.jabber.client import JabberClient
 from pyxmpp.streamtls import TLSSettings
+import optparse
+import utils
+from __init__ import __version__
+try:
+    import gettext
+    _ = gettext.translation(domain='openhriweb', localedir=os.path.dirname(__file__)+'/../share/locale').ugettext
+except:
+    _ = lambda s: s
+
+__doc__ = _('Bridge RTC data stream to Jabber(XMPP) message. By using this component you can send and receive messages to Jabber clients (e.g. google talk) from your robot.')
 
 class Client(JabberClient):
     def __init__(self, jid, password, obj):
@@ -48,13 +57,13 @@ class Client(JabberClient):
         f = stanza.get_from().as_unicode()
         body = stanza.get_body()
         if body is not None:
-            print u'%s has send you message: %s' % (f, body)
+            self._rtobj._logger.RTC_INFO(u'%s has send you message: %s' % (f, body))
             self._rtobj._outdata.data[0] = body
             self._rtobj._outdata.data[1] = f
             self._rtobj._outport.write()
 
     def sendmessage(self, to, body):
-        print u'send message to %s: %s' % (to, body)
+        self._rtobj._logger.RTC_INFO(u'send message to %s: %s' % (to, body))
         self.stream.send(Message(to_jid = JID(to), body = body))
 
     def presence(self, stanza):
@@ -64,7 +73,7 @@ class Client(JabberClient):
             state = "unavailable"
         if stanza.get_show() == "away":
             state = "away"
-        print u"%s has become %s" % (f, state)
+        self._rtobj._logger.RTC_INFO(u"%s has become %s" % (f, state))
         self._rtobj._statedata.data[0] = state
         self._rtobj._statedata.data[1] = f
         self._rtobj._stateport.write()
@@ -75,8 +84,8 @@ class Client(JabberClient):
 
 JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "type_name",         "JabberRTC",
-                  "description",       "Jabber(XMPP) messaging component",
-                  "version",           "1.0.0",
+                  "description",       __doc__.encode('UTF-8'),
+                  "version",           __version__,
                   "vendor",            "AIST",
                   "category",          "communication",
                   "activity_type",     "DataFlowComponent",
@@ -84,20 +93,13 @@ JabberRTC_spec = ["implementation_id", "JabberRTC",
                   "language",          "Python",
                   "lang_type",         "script",
                   "conf.default.id",               "[your id]@gmail.com",
-                  "conf.__description__.id",       "Id of your Jabber account (e.g. john.doe@example.com).",
+                  "conf.__description__.id",       _("Id of your Jabber account (e.g. john.doe@example.com).").encode('UTF-8'),
                   "conf.default.password",         "[your password]",
-                  "conf.__description__.password", "Password of your Jabber account.",
-                  "conf.__doc__.__contact__",  "Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>",
-                  "conf.__doc__.__license__",  "EPL",
-                  "conf.__doc__.__url__",  "http://openhri.net/",
-                  "conf.__doc__.intro",  """
-Bridge RTC data stream to Jabber(XMPP) message. By using this component
-you can send and receive messages to Jabber clients (e.g. google talk) from
-your robot.
-""",
+                  "conf.__description__.password", _("Password of your Jabber account.").encode('UTF-8'),
                   "conf.__doc__.usage",         """
-To run this component:
- $ jabberrtc
+To run this component::
+
+  $ jabberrtc
 
 Examples:
  See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/jabberrtc
@@ -116,11 +118,15 @@ class DataListener(OpenRTM_aist.ConnectorDataListenerT):
 class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
     def __init__(self, manager):
         OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
+        self._logger = OpenRTM_aist.Manager.instance().getLogbuf("JabberRTC")
+        self._logger.RTC_INFO("JabberRTC version " + __version__)
+        self._logger.RTC_INFO("Copyright (C) 2010 Yosuke Matsusaka")
         self._c = None
         self._jid = ['',]
         self._password = ['',]
 
     def onInitialize(self):
+        OpenRTM_aist.DataFlowComponentBase.onInitialize(self)
         # bind configuration parameters
         self.bindParameter('id', self._jid, '[your id]@gmail.com')
         self.bindParameter('password', self._password, '[your password]')
@@ -129,26 +135,28 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
         self._inport = OpenRTM_aist.InPort('text', self._indata)
         self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
                                               DataListener('ON_BUFFER_WRITE', self))
-        self._inport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "addressee1", "adressee2",...]')
+        self._inport.appendProperty('description', _('Message in TimedStringSeq format (["message body", "addressee1", "adressee2",...]').encode('UTF-8'))
         self.registerInPort(self._inport._name, self._inport)
         # create outport for message
         self._outdata = RTC.TimedStringSeq(RTC.Time(0,0), [])
         self._outport = OpenRTM_aist.OutPort('message', self._outdata)
-        self._outport.appendProperty('description', 'Message in TimedStringSeq format (["message body", "from"]')
+        self._outport.appendProperty('description', _('Message in TimedStringSeq format (["message body", "from"]').encode('UTF-8'))
         self.registerOutPort(self._outport._name, self._outport)
         # create outport for status
         self._statedata = RTC.TimedStringSeq(RTC.Time(0,0), [])
         self._stateport = OpenRTM_aist.OutPort('status', self._statedata)
-        self._stateport.appendProperty('description', 'Status in TimedStringSeq format (["status", "from"]')
+        self._stateport.appendProperty('description', _('Status in TimedStringSeq format (["status", "from"]').encode('UTF-8'))
         self.registerOutPort(self._stateport._name, self._stateport)
         return RTC.RTC_OK
 
     def onActivated(self, ec_id):
+        OpenRTM_aist.DataFlowComponentBase.onActivated(self, ec_id)
         self._c = Client(JID(self._jid[0]), self._password[0], self)
         self._c.connect()
         return RTC.RTC_OK
     
     def onDeactivate(self, ec_id):
+        OpenRTM_aist.DataFlowComponentBase.onDeactivate(self, ec_id)
         if self._c:
             self._c.disconnect()
             self._c = None
@@ -163,11 +171,13 @@ class JabberRTC(OpenRTM_aist.DataFlowComponentBase):
         pass
     
     def onExecute(self, ec_id):
+        OpenRTM_aist.DataFlowComponentBase.onExecute(self, ec_id)
         if self._c:
             self._c.loop(1)
         return RTC.RTC_OK
 
     def onFinalize(self):
+        OpenRTM_aist.DataFlowComponentBase.onFinalize(self)
         if self._c:
             self._c.disconnect()
             self._c = None
@@ -178,19 +188,23 @@ def JabberRTCInit(manager):
     manager.registerFactory(profile, JabberRTC, OpenRTM_aist.Delete)
 
 def MyModuleInit(manager):
-    global comp
     JabberRTCInit(manager)
     comp = manager.createComponent('JabberRTC')
 
 def main():
-    locale.setlocale(locale.LC_CTYPE, '')
-    encoding = locale.getlocale()[1]
-    if not encoding:
-        encoding = 'us-ascii'
-    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = 'replace')
-    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = 'replace')
+    encoding = locale.getpreferredencoding()
+    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = "replace")
+    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = "replace")
+    
+    parser = utils.MyParser(version=__version__, description=__doc__)
+    utils.addmanageropts(parser)
+    try:
+        opts, args = parser.parse_args()
+    except optparse.OptionError, e:
+        print >>sys.stderr, 'OptionError:', e
+        sys.exit(1)
 
-    manager = OpenRTM_aist.Manager.init(sys.argv)
+    manager = OpenRTM_aist.Manager.init(utils.genmanagerargs(opts))
     manager.setModuleInitProc(MyModuleInit)
     manager.activateManager()
     manager.runManager()

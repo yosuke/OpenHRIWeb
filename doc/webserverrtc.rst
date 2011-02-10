@@ -1,25 +1,17 @@
 WebServerRTC0.rtc
 =================
-Web server component
+Bridge RTC data stream to HTTP protocol. By using this component you can control your robot using web browser.
 
 :Vendor: Yosuke Matsusaka, AIST
-:Version: 1.0.0
+:Version: 1.00
 :Category: Web
-:License: EPL
-:Contact: Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>
-:URL: http://openhri.net/
-
-Introduction
-============
-
-Bridge RTC data stream to HTTP protocol. By using this component you can
-control your robot using web browser.
 
 Usage
 =====
 
-To run this component:
- $ webserverrtc
+To run this component::
+
+  $ webserverrtc
 
 Examples:
  See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/webserverrtc

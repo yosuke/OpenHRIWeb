@@ -1,26 +1,17 @@
 JabberRTC0.rtc
 ==============
-Jabber(XMPP) messaging component
+Bridge RTC data stream to Jabber(XMPP) message. By using this component you can send and receive messages to Jabber clients (e.g. google talk) from your robot.
 
 :Vendor: AIST
-:Version: 1.0.0
+:Version: 1.00
 :Category: communication
-:License: EPL
-:Contact: Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>
-:URL: http://openhri.net/
-
-Introduction
-============
-
-Bridge RTC data stream to Jabber(XMPP) message. By using this component
-you can send and receive messages to Jabber clients (e.g. google talk) from
-your robot.
 
 Usage
 =====
 
-To run this component:
- $ jabberrtc
+To run this component::
+
+  $ jabberrtc
 
 Examples:
  See https://github.com/yosuke/OpenHRIWeb/tree/master/examples/jabberrtc

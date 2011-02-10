@@ -1,0 +1,6 @@
+openhriweb/JabberRTC.py
+openhriweb/Manager.py
+openhriweb/WebServerRTC.py
+openhriweb/XMLtoJSONRTC.py
+openhriweb/__init__.py
+openhriweb/utils.py

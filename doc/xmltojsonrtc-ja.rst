@@ -1,6 +1,6 @@
 XMLtoJSONRTC0.rtc
 =================
-XML to JSON conversion component
+XMLからJSON形式に変換するコンポーネント
 
 :Vendor: AIST
 :Version: 1.00
@@ -19,6 +19,6 @@ Ports
    :header: "Name", "Type", "DataType", "Description"
    :widths: 8, 8, 8, 26
    
-   "text", "DataInPort", "TimedString", "Input text in XML format."
-   "result", "DataOutPort", "TimedString", "Output text in JSON format."
+   "text", "DataInPort", "TimedString", "XML形式の入力テキスト"
+   "result", "DataOutPort", "TimedString", "JSON形式の出力テキスト"
 

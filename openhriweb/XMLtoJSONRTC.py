@@ -25,6 +25,15 @@ import lxml.objectify
 import simplejson as json
 import OpenRTM_aist
 import RTC
+import utils
+from __init__ import __version__
+try:
+    import gettext
+    _ = gettext.translation(domain='openhriweb', localedir=os.path.dirname(__file__)+'/../share/locale').ugettext
+except:
+    _ = lambda s: s
+
+__doc__ = _('XML to JSON conversion component')
 
 # the objectJSONEncoder class
 # (thanks to Anton I. Sipos, http://gist.github.com/345559):
@@ -42,14 +51,19 @@ class objectJSONEncoder(json.JSONEncoder):
 
 XMLtoJSONRTC_spec = ["implementation_id", "XMLtoJSONRTC",
                      "type_name",         "XMLtoJSONRTC",
-                     "description",       "XML to JSON conversion component",
-                     "version",           "1.0.0",
+                     "description",       __doc__.encode('UTF-8'),
+                     "version",           __version__,
                      "vendor",            "AIST",
                      "category",          "communication",
                      "activity_type",     "DataFlowComponent",
                      "max_instance",      "10",
                      "language",          "Python",
                      "lang_type",         "script",
+                     "conf.__doc__.usage",         """
+To run this component::
+
+  $ xmltojsonrtc
+""",
                      ""]
 
 class DataListener(OpenRTM_aist.ConnectorDataListenerT):
@@ -64,20 +78,24 @@ class DataListener(OpenRTM_aist.ConnectorDataListenerT):
 class XMLtoJSONRTC(OpenRTM_aist.DataFlowComponentBase):
     def __init__(self, manager):
         OpenRTM_aist.DataFlowComponentBase.__init__(self, manager)
+        self._logger = OpenRTM_aist.Manager.instance().getLogbuf("XMLtoJSONRTC")
+        self._logger.RTC_INFO("XMLtoJSONRTC version " + __version__)
+        self._logger.RTC_INFO("Copyright (C) 2010 Yosuke Matsusaka")
 
     def onInitialize(self):
+        OpenRTM_aist.DataFlowComponentBase.onInitialize(self)
         self._transform = objectJSONEncoder()
         # create inport
         self._indata = RTC.TimedString(RTC.Time(0,0), "")
         self._inport = OpenRTM_aist.InPort("text", self._indata)
-        self._inport.appendProperty('description', 'Input text in XML format.')
+        self._inport.appendProperty('description', _('Input text in XML format.').encode('UTF-8'))
         self._inport.addConnectorDataListener(OpenRTM_aist.ConnectorDataListenerType.ON_BUFFER_WRITE,
                                               DataListener("ON_BUFFER_WRITE", self))
         self.registerInPort(self._inport._name, self._inport)
         # create outport
         self._outdata = RTC.TimedString(RTC.Time(0,0), "")
         self._outport = OpenRTM_aist.OutPort("result", self._outdata)
-        self._outport.appendProperty('description', 'Output text in JSON format.')
+        self._outport.appendProperty('description', _('Output text in JSON format.').encode('UTF-8'))
         self.registerOutPort(self._inport._name, self._outport)
         return RTC.RTC_OK
     
@@ -85,49 +103,36 @@ class XMLtoJSONRTC(OpenRTM_aist.DataFlowComponentBase):
         udoc = lxml.objectify.fromstring(data.data)
         self._outdata.data = self._transform.encode(udoc)
         self._outport.write(self._outdata)
-        print self._outdata.data
+        self._logger.RTC_INFO(self._outdata.data)
 
 def XMLtoJSONRTCInit(manager):
     profile = OpenRTM_aist.Properties(defaults_str=XMLtoJSONRTC_spec)
     manager.registerFactory(profile, XMLtoJSONRTC, OpenRTM_aist.Delete)
 
 def MyModuleInit(manager):
-    global comp
     XMLtoJSONRTCInit(manager)
     comp = manager.createComponent('XMLtoJSONRTC')
 
-def usage():
-    print "usage: %s [-f rtc.conf] [--help]" % (os.path.basename(sys.argv[0]),)
-
 def main():
-    locale.setlocale(locale.LC_CTYPE, '')
-    encoding = locale.getlocale()[1]
-    if not encoding:
-        encoding = 'us-ascii'
-    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = 'replace')
-    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = 'replace')
-
+    encoding = locale.getpreferredencoding()
+    sys.stdout = codecs.getwriter(encoding)(sys.stdout, errors = "replace")
+    sys.stderr = codecs.getwriter(encoding)(sys.stderr, errors = "replace")
+    
+    parser = utils.MyParser(version=__version__, description=__doc__)
+    utils.addmanageropts(parser)
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "adlf:o:p:h", ["help",])
-    except getopt.GetoptError:
-        usage()
-        sys.exit()
-    managerargs = [sys.argv[0]]
-    for o, a in opts:
-        if o in ("-a", "-d", "-l"):
-            managerargs.append(o)
-        if o in ("-f", "-o", "-p"):
-            managerargs.append(o, a)
-        if o in ("-h", "--help"):
-            usage()
-            sys.exit()
+        opts, args = parser.parse_args()
+    except optparse.OptionError, e:
+        print >>sys.stderr, 'OptionError:', e
+        return 1
 
-    manager = OpenRTM_aist.Manager.init(managerargs)
+    manager = OpenRTM_aist.Manager.init(utils.genmanagerargs(opts))
     manager.setModuleInitProc(MyModuleInit)
     manager.activateManager()
     manager.runManager()
+    return 0
 
 if __name__=='__main__':
-    main()
+    sys.exit(main())
 
 

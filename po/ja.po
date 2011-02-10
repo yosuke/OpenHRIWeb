@@ -1,0 +1,94 @@
+# Japanese translations for PACKAGE package.
+# Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# matsusaka <yosuke.matsusaka@aist.go.jp>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-10 11:53+0900\n"
+"PO-Revision-Date: 2011-02-10 11:55+0900\n"
+"Last-Translator: Yosuke Matsusaka <yosuke.matsusaka@aist.go.jp>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: ../openhriweb/JabberRTC.py:33
+msgid "Bridge RTC data stream to Jabber(XMPP) message. By using this component you can send and receive messages to Jabber clients (e.g. google talk) from your robot."
+msgstr "RTCデータストリームをJabber(XMPP)メッセージに変換するコンポーネント。このコンポーネントを使うことでロボットからJabberクライアント（google talkなど）へメッセージを送ることが可能になります。"
+
+#: ../openhriweb/JabberRTC.py:94
+msgid "Id of your Jabber account (e.g. john.doe@example.com)."
+msgstr "あなたのJabberアカウントのID（例: john.doe@example.com）"
+
+#: ../openhriweb/JabberRTC.py:96
+msgid "Password of your Jabber account."
+msgstr "あなたのJabberアカウントのパスワード"
+
+#: ../openhriweb/JabberRTC.py:136
+msgid "Message in TimedStringSeq format ([\"message body\", \"addressee1\", \"adressee2\",...]"
+msgstr "TimedStringSeq形式のメッセージ（[\"メッセージ本文\", \"宛先1\", \"宛先2\", ...]）"
+
+#: ../openhriweb/JabberRTC.py:141
+msgid "Message in TimedStringSeq format ([\"message body\", \"from\"]"
+msgstr "TimedStringSeq形式のメッセージ（[\"メッセージ本文\", \"送信元\"]）"
+
+#: ../openhriweb/JabberRTC.py:146
+msgid "Status in TimedStringSeq format ([\"status\", \"from\"]"
+msgstr "TimedStringSeq形式の状態情報（[\"状態\", \"アカウント名\"]）"
+
+#: ../openhriweb/WebServerRTC.py:38
+msgid "Bridge RTC data stream to HTTP protocol. By using this component you can control your robot using web browser."
+msgstr "RTCデータストリームをHTTPプロトコルに変換するコンポーネントです。このコンポーネントを使うことで、ロボットをウェブブラウザを使って操作することが可能になります。"
+
+#: ../openhriweb/WebServerRTC.py:77
+msgid "Port of HTTP server (e.g. 6809)."
+msgstr "HTTPサーバのポート（例：6809）"
+
+#: ../openhriweb/WebServerRTC.py:79
+msgid "Root path of html documents (e.g. /var/www)."
+msgstr "htmlドキュメントへのパス（例: /var/www）"
+
+#: ../openhriweb/WebServerRTC.py:107
+msgid "Text message to be accessed via url [/rtc/indata] using javascript code."
+msgstr "javascriptを使ってURL [/rtc/indata] からアクセス可能になるテキストデータ"
+
+#: ../openhriweb/WebServerRTC.py:111
+msgid "Text message to be accessed via url [/rtc/outdata] using javascript code."
+msgstr "javascriptを使ってURL [/rtc/outdata] からアクセス可能になるテキストデータ"
+
+#: ../openhriweb/XMLtoJSONRTC.py:36
+msgid "XML to JSON conversion component"
+msgstr "XMLからJSON形式に変換するコンポーネント"
+
+#: ../openhriweb/XMLtoJSONRTC.py:91
+msgid "Input text in XML format."
+msgstr "XML形式の入力テキスト"
+
+#: ../openhriweb/XMLtoJSONRTC.py:98
+msgid "Output text in JSON format."
+msgstr "JSON形式の出力テキスト"
+
+#: ../openhriweb/utils.py:93
+msgid "enable manager to be controlled as corba servant"
+msgstr ""
+
+#: ../openhriweb/utils.py:96
+msgid "specify custom configuration file"
+msgstr ""
+
+#: ../openhriweb/utils.py:99
+msgid "specify custom configuration parameter"
+msgstr ""
+
+#: ../openhriweb/utils.py:102
+msgid "specify custom corba endpoint"
+msgstr ""
+
+#: ../openhriweb/utils.py:105
+msgid "configure manager to be master"
+msgstr ""
+
