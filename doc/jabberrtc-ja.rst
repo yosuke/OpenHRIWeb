@@ -1,5 +1,5 @@
-JabberRTC0.rtc
-==============
+JabberRTC
+=========
 RTCデータストリームをJabber(XMPP)メッセージに変換するコンポーネント。このコンポーネントを使うことでロボットからJabberクライアント（google talkなど）へメッセージを送ることが可能になります。
 
 :Vendor: AIST
@@ -7,7 +7,7 @@ RTCデータストリームをJabber(XMPP)メッセージに変換するコン�
 :Category: communication
 
 Usage
-=====
+-----
 
 To run this component::
 
@@ -26,9 +26,20 @@ Ports
    "message", "DataOutPort", "TimedStringSeq", "TimedStringSeq形式のメッセージ（['メッセージ本文', '送信元']）"
    "status", "DataOutPort", "TimedStringSeq", "TimedStringSeq形式の状態情報（['状態', 'アカウント名']）"
 
+.. digraph:: comp
+
+   rankdir=LR;
+   JabberRTC [shape=Mrecord, label="JabberRTC"];
+   text [shape=plaintext, label="text"];
+   text -> JabberRTC;
+   message [shape=plaintext, label="message"];
+   JabberRTC -> message;
+   status [shape=plaintext, label="status"];
+   JabberRTC -> status;
+
 Configuration parameters
 ------------------------
-.. csv-table:: Configration parameters
+.. csv-table:: Configuration parameters
    :header: "Name", "Description"
    :widths: 12, 38
    

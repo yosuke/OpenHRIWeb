@@ -1,5 +1,5 @@
-JabberRTC0.rtc
-==============
+JabberRTC
+=========
 Bridge RTC data stream to Jabber(XMPP) message. By using this component you can send and receive messages to Jabber clients (e.g. google talk) from your robot.
 
 :Vendor: AIST
@@ -7,7 +7,7 @@ Bridge RTC data stream to Jabber(XMPP) message. By using this component you can 
 :Category: communication
 
 Usage
-=====
+-----
 
 To run this component::
 
@@ -26,9 +26,20 @@ Ports
    "message", "DataOutPort", "TimedStringSeq", "Message in TimedStringSeq format (['message body', 'from']"
    "status", "DataOutPort", "TimedStringSeq", "Status in TimedStringSeq format (['status', 'from']"
 
+.. digraph:: comp
+
+   rankdir=LR;
+   JabberRTC [shape=Mrecord, label="JabberRTC"];
+   text [shape=plaintext, label="text"];
+   text -> JabberRTC;
+   message [shape=plaintext, label="message"];
+   JabberRTC -> message;
+   status [shape=plaintext, label="status"];
+   JabberRTC -> status;
+
 Configuration parameters
 ------------------------
-.. csv-table:: Configration parameters
+.. csv-table:: Configuration parameters
    :header: "Name", "Description"
    :widths: 12, 38
    

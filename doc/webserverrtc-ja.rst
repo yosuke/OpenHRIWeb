@@ -1,5 +1,5 @@
-WebServerRTC0.rtc
-=================
+WebServerRTC
+============
 RTCデータストリームをHTTPプロトコルに変換するコンポーネントです。このコンポーネントを使うことで、ロボットをウェブブラウザを使って操作することが可能になります。
 
 :Vendor: Yosuke Matsusaka, AIST
@@ -7,7 +7,7 @@ RTCデータストリームをHTTPプロトコルに変換するコンポーネ�
 :Category: Web
 
 Usage
-=====
+-----
 
 To run this component::
 
@@ -25,9 +25,18 @@ Ports
    "indata", "DataInPort", "TimedString", "javascriptを使ってURL [/rtc/indata] からアクセス可能になるテキストデータ"
    "outdata", "DataOutPort", "TimedString", "javascriptを使ってURL [/rtc/outdata] からアクセス可能になるテキストデータ"
 
+.. digraph:: comp
+
+   rankdir=LR;
+   WebServerRTC [shape=Mrecord, label="WebServerRTC"];
+   indata [shape=plaintext, label="indata"];
+   indata -> WebServerRTC;
+   outdata [shape=plaintext, label="outdata"];
+   WebServerRTC -> outdata;
+
 Configuration parameters
 ------------------------
-.. csv-table:: Configration parameters
+.. csv-table:: Configuration parameters
    :header: "Name", "Description"
    :widths: 12, 38
    

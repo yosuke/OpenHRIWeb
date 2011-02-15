@@ -1,5 +1,5 @@
-XMLtoJSONRTC0.rtc
-=================
+XMLtoJSONRTC
+============
 XML to JSON conversion component
 
 :Vendor: AIST
@@ -7,7 +7,7 @@ XML to JSON conversion component
 :Category: communication
 
 Usage
-=====
+-----
 
 To run this component::
 
@@ -21,4 +21,13 @@ Ports
    
    "text", "DataInPort", "TimedString", "Input text in XML format."
    "result", "DataOutPort", "TimedString", "Output text in JSON format."
+
+.. digraph:: comp
+
+   rankdir=LR;
+   XMLtoJSONRTC [shape=Mrecord, label="XMLtoJSONRTC"];
+   text [shape=plaintext, label="text"];
+   text -> XMLtoJSONRTC;
+   result [shape=plaintext, label="result"];
+   XMLtoJSONRTC -> result;
 

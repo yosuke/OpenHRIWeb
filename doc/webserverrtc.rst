@@ -1,5 +1,5 @@
-WebServerRTC0.rtc
-=================
+WebServerRTC
+============
 Bridge RTC data stream to HTTP protocol. By using this component you can control your robot using web browser.
 
 :Vendor: Yosuke Matsusaka, AIST
@@ -7,7 +7,7 @@ Bridge RTC data stream to HTTP protocol. By using this component you can control
 :Category: Web
 
 Usage
-=====
+-----
 
 To run this component::
 
@@ -25,9 +25,18 @@ Ports
    "indata", "DataInPort", "TimedString", "Text message to be accessed via url [/rtc/indata] using javascript code."
    "outdata", "DataOutPort", "TimedString", "Text message to be accessed via url [/rtc/outdata] using javascript code."
 
+.. digraph:: comp
+
+   rankdir=LR;
+   WebServerRTC [shape=Mrecord, label="WebServerRTC"];
+   indata [shape=plaintext, label="indata"];
+   indata -> WebServerRTC;
+   outdata [shape=plaintext, label="outdata"];
+   WebServerRTC -> outdata;
+
 Configuration parameters
 ------------------------
-.. csv-table:: Configration parameters
+.. csv-table:: Configuration parameters
    :header: "Name", "Description"
    :widths: 12, 38
    
